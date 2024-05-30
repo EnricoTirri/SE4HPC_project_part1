@@ -925,14 +925,15 @@ TEST(ScalarVector, OneScalarTimesNormalVector) {
 // Fuzzy test ********************************************************
 
 TEST(FuzzyTest, FuzzyTest) {
+    auto test_number = 9000;
     int aRows = 2;
     int aCols = 3;
     int bCols = 2;
-    auto result_list = std::vector<std::vector<std::vector<int>>>(90000, std::vector<std::vector<int>>(9, std::vector<int>(9, 0)));
-    auto expected_list = std::vector<std::vector<std::vector<int>>>(90000, std::vector<std::vector<int>>(9, std::vector<int>(9, 0)));
+    auto result_list = std::vector<std::vector<std::vector<int>>>(test_number, std::vector<std::vector<int>>(9, std::vector<int>(9, 0)));
+    auto expected_list = std::vector<std::vector<std::vector<int>>>(test_number, std::vector<std::vector<int>>(9, std::vector<int>(9, 0)));
         #include <random>
     std::random_device rd;
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < test_number/9; i++) {
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(-100, 100);
         std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
@@ -956,7 +957,7 @@ TEST(FuzzyTest, FuzzyTest) {
     aCols = 1;
     bCols = 1;
 
-    for( int i = 1000 ; i < 2000 ; i++){
+    for( int i = test_number/9 ; i < test_number/9*2 ; i++){
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(-200, 200);
         std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
@@ -980,7 +981,7 @@ TEST(FuzzyTest, FuzzyTest) {
     aCols = 8;
     bCols = 8;
 
-    for( int i = 2000 ; i < 5000 ; i++){
+    for( int i = test_number/9*2 ; i < test_number/9*5 ; i++){
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(-200, 200);
         std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
@@ -1000,7 +1001,7 @@ TEST(FuzzyTest, FuzzyTest) {
     }
     //let's now fuzzy test random dimensions'
 
-    for (int i = 5000; i < 9000; i++) {
+    for (int i = test_number/9*5; i < test_number; i++) {
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 9);
         aRows = dis(gen);
