@@ -4,6 +4,7 @@ project(MatrixMultiplication)
 
 include_directories(include)
 
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
 
 add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
