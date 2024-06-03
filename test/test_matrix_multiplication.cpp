@@ -908,7 +908,7 @@ TEST(MatricesProperties, NotCommutative){
 
 
     multiplyMatrices(A, B, C1, aRows, aCols, bCols);
-    multiplyMatrices(A, B, C2, aRows, aCols, bCols);
+    multiplyMatrices(B, A, C2, aRows, aCols, bCols);
 
     ASSERT_NE(C1,C2) << "Commutative test failed";
 }
