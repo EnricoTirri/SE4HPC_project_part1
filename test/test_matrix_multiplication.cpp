@@ -3,11 +3,9 @@
 #include <gtest/gtest.h>
 #include <random>
 
+#define FUZZY_IT 50
 
-// ######################### Source code of multiplyMatrices in src/matrix_mult
-
-
-
+// CORRECT IMPLEMENTATION OF MATRIX MULTIPLICATION (FOR CROSS-CHECKS)
 
 void multiplyMatricesWithoutErrors(const std::vector<std::vector<int>> &A,
                                    const std::vector<std::vector<int>> &B,
@@ -23,97 +21,71 @@ void multiplyMatricesWithoutErrors(const std::vector<std::vector<int>> &A,
     }
 }
 
-// TEST ON UNITARY MATRICES ********************************************************
+// TESTS ON UNITARY-DIMENSION MATRICES ********************************************************
+// The following suite of tests wants to check various behaviour when the function is
+// required to perform a simple scalar multiplication
 
-TEST(UnitaryMatricesTests, SignTestPP) {
+
+/*
+ * The following test checks the behaviour of the function with combination of signed operation
+ */
+TEST(UnitaryMatricesTests, SignsTest) {
     int aRows = 1;
     int aCols = 1;
     int bCols = 1;
 
-    std::vector<std::vector<int>> A = {
+    std::vector<std::vector<int>> AP = {
             {1}
     };
-    std::vector<std::vector<int>> B = {
+    std::vector<std::vector<int>> BP = {
             {1}
     };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Sign Test failed on + +";
-}
-
-TEST(UnitaryMatricesTests, SignTestMP) {
-    int aRows = 1;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {-1}
-    };
-    std::vector<std::vector<int>> B = {
+    std::vector<std::vector<int>> AN = {
             {1}
     };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Sign Test failed on - +";
-}
-
-TEST(UnitaryMatricesTests, SignTestPM) {
-    int aRows = 1;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
+    std::vector<std::vector<int>> BN = {
             {1}
     };
-    std::vector<std::vector<int>> B = {
-            {-1}
-    };
+
     std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
     std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
 
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+    multiplyMatrices(AP, BP, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AP, BP, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Sign Test failed on + -";
+    EXPECT_EQ(C, expected) << "Sign Test failed on (+) * (+)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AP, BN, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AP, BN, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Sign Test failed on (+) * (-)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AN, BP, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AN, BP, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Sign Test failed on (-) * (+)";
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AN, BN, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AN, BN, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Sign Test failed on (-) * (-)";
 }
 
-TEST(UnitaryMatricesTests, SignTestMM) {
-    int aRows = 1;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {-1}
-    };
-    std::vector<std::vector<int>> B = {
-            {-1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Sign Test failed on - -";
-}
-
-TEST(UnitaryMatricesTests, ZeroMatTest) {
+/*
+ * The following test checks the behaviour of the function when at least one of the factors is equal to 0
+ */
+TEST(UnitaryMatricesTests, ZeroTest) {
     int aRows = 1;
     int aCols = 1;
     int bCols = 1;
@@ -124,269 +96,76 @@ TEST(UnitaryMatricesTests, ZeroMatTest) {
     std::vector<std::vector<int>> B = {
             {1}
     };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 1));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 1));
 
     multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
     multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Sign Test failed 0 * n";
+    EXPECT_EQ(C, expected) << "Zero Test failed on (0) * (1)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(B, A, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(B, A, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Zero Test failed on (1) * (0)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(A, A, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(A, A, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Zero Test failed on (0) * (0)";
 }
 
-TEST(UnitaryMatricesTests, ZeroVetTest) {
+/*
+ * The following test does fuzzy test on the behaviour of the function with random value
+ */
+TEST(UnitaryMatricesTests, FuzzyTest){
     int aRows = 1;
     int aCols = 1;
     int bCols = 1;
 
-    std::vector<std::vector<int>> A = {
-            {1}
-    };
-    std::vector<std::vector<int>> B = {
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> A = {{0}};
+    std::vector<std::vector<int>> B = {{0}};
 
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
+    std::random_device rd;
+    for (int i = 0; i < FUZZY_IT; i++) {
+        std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+        std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
 
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(-200, 200);
+        A[0][0] = dis(gen);
+        B[0][0] = dis(gen);
 
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+        multiplyMatrices(A, B, C, aRows, aCols, bCols);
+        multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Sign Test failed on n * 0";
-}
-
-TEST(UnitaryMatricesTests, ZeroMatVetTest) {
-    int aRows = 1;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {-1}
-    };
-    std::vector<std::vector<int>> B = {
-            {-1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Sign Test failed on 0 * 0";
-}
-
-TEST(UnitaryMatricesTests, IdentityTest) {
-    int aRows = 1;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1}
-    };
-    std::vector<std::vector<int>> B = {
-            {5}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Sign Test failed on identity";
+        EXPECT_EQ(C,expected) << "Fuzzy test iteration failed";
+    }
 }
 
 
+// TEST ON SQUARE MATRICES ************************************************************************************
+// The following suite of tests wants to check various behaviour when the function is
+// required to perform matrix multiplication on the "smallest" matrix first factor format (i.e. 2x2)
 
-// TEST ON square MATRICES times vector ********************************************************
-
-TEST(SquareVector, ZeroMatTest) {
+/*
+ * The following test checks the behaviour of the function with signed vector
+ */
+TEST(SquareMatricesTests, SignTest) {
     int aRows = 2;
     int aCols = 2;
     int bCols = 1;
 
     std::vector<std::vector<int>> A = {
-            {0, 0},
-            {0, 0}
-    };
-    std::vector<std::vector<int>> B = {
-            {1},
-            {1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero Mat Test failed";
-}
-
-
-TEST(SquareVector, ZeroVetTest) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1, 1},
-            {1, 1}
-    };
-    std::vector<std::vector<int>> B = {
-            {0},
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero Vet Test failed";
-}
-
-TEST(SquareVector, IdentityTest) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1, 0},
-            {0, 1}
-    };
-    std::vector<std::vector<int>> B = {
-            {5},
-            {5}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Identity Test failed";
-}
-
-
-TEST(SquareVector, IdentityZeroVetTest) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1, 0},
-            {0, 1}
-    };
-    std::vector<std::vector<int>> B = {
-            {0},
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Identity Zero Vet Test failed";
-}
-
-
-TEST(SquareVector, NormalTest) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1, 2},
-            {-3, 7}
-    };
-    std::vector<std::vector<int>> B = {
-            {8},
-            {8}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-
-TEST(SquareVector, ZeroMatZeroVetTest) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {0, 0},
-            {0, 0}
-    };
-    std::vector<std::vector<int>> B = {
-            {0},
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero Mat Zero Vet Test failed";
-}
-
-
-
-TEST(SquareVector, SquaretimesOneVector) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1, 2},
-            {-3, 7}
-    };
-    std::vector<std::vector<int>> B = {
-            {1},
-            {1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Matrix times 1 vector failed";
-}
-
-
-TEST(SquareVector, SquareTimesMinusOneVector) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {8, 8},
+            {8,  8},
             {-3, 7}
     };
     std::vector<std::vector<int>> B = {
@@ -401,212 +180,275 @@ TEST(SquareVector, SquareTimesMinusOneVector) {
 
     multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Matrix times -1 vector failed";
+    ASSERT_EQ(C, expected) << "2x2 Sign test failed";
 }
 
-
-//TEst on rectangular matrices ********************************************************
-
-TEST(RectangularMatrices, NormalTest) {
+/*
+ * The following test checks the behaviour of the function when at least one of the factors is equal to 0
+ */
+TEST(SquareMatricesTests, ZeroTest) {
     int aRows = 2;
-    int aCols = 3;
-    int bCols = 2;
+    int aCols = 2;
+    int bCols = 1;
 
-    std::vector<std::vector<int>> A = {
-            {1, 8, 3},
-            {4, 5, 8}
+    std::vector<std::vector<int>> AZ = {
+            {0, 0},
+            {0, 0}
     };
-    std::vector<std::vector<int>> B = {
-            {7, 8},
-            {9, 10},
-            {11, 12}
+    std::vector<std::vector<int>> BU = {
+            {1},
+            {1}
+    };
+
+    std::vector<std::vector<int>> AU = {
+            {1, 1},
+            {1, 1}
+    };
+    std::vector<std::vector<int>> BZ = {
+            {0},
+            {0}
+    };
+
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 1));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BU, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BU, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "2x2 Zero Test failed on (0) * (1)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AU, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AU, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "2x2 Zero Test failed on (1) * (0)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "2x2 Zero Test failed on (0) * (0)";
+}
+
+/*
+ * The following test checks the behaviour of the function when matrix is an identity or vector is an identity
+ */
+TEST(SquareMatricesTests, IdentityTest) {
+    int aRows = 2;
+    int aCols = 2;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> AI = {
+            {1, 0},
+            {0, 1}
+    };
+    std::vector<std::vector<int>> BN = {
+            {5},
+            {5}
+    };
+
+    std::vector<std::vector<int>> AN = {
+            {1,  2},
+            {-3, 7}
+    };
+    std::vector<std::vector<int>> BI = {
+            {1},
+            {1}
     };
     std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
 
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
+    multiplyMatrices(AI, BN, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AI, BN, expected, aRows, aCols, bCols);
 
-    std::vector<std::vector<int>> expected = {
-            {58, 64},
-            {139, 154}
-    };
+    EXPECT_EQ(C, expected) << "2x2 Matrix Identity  Test failed";
 
-    ASSERT_EQ(C, expected) << "Normal Test failed";
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AN, BI, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AN, BI, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "2x2 Vector Identity failed";
+}
+
+/*
+ * The following test does fuzzy test on the behaviour of the function with random values
+ */
+TEST(SquareMatricesTests, FuzzyTest) {
+    int aRows = 2;
+    int aCols = 2;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols,0));
+    std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols,0));
+
+    std::random_device rd;
+    for (int i = 0; i < FUZZY_IT; i++) {
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(1, 9);
+        std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+        std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+        for (int j = 0; j < aRows; j++) {
+            for (int k = 0; k < aCols; k++) {
+                A[j][k] = dis(gen);
+            }
+        }
+        for (int j = 0; j < aCols; j++) {
+            for (int k = 0; k < bCols; k++) {
+                B[j][k] = dis(gen);
+            }
+        }
+        multiplyMatrices(A, B, C, aRows, aCols, bCols);
+        multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+        EXPECT_EQ(C, expected) << "2x2 Fuzzy Test iteration failed";
+    }
 }
 
 
-TEST(RectangularMatrices, ZeroMatZeroMatTest) {
+// TEST ON RECTANGULAR MATRICES ********************************************************
+// The following suite of tests wants to check various behaviour when the function is
+// required to perform matrix multiplication with rectangular form first factor
+
+/*
+ * The following test checks the behaviour of the function when at least one of the factors is equal to 0
+ */
+TEST(RectangularMatricesTests, ZeroTest) {
     int aRows = 2;
     int aCols = 3;
     int bCols = 2;
 
-    std::vector<std::vector<int>> A = {
+    std::vector<std::vector<int>> AZ = {
             {0, 0, 0},
             {0, 0, 0}
     };
-    std::vector<std::vector<int>> B = {
+    std::vector<std::vector<int>> AU = {
+            {1, 2, 3},
+            {4, 5, 6}
+    };
+    std::vector<std::vector<int>> BZ = {
             {0, 0},
             {0, 0},
             {0, 0}
     };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected = {
-            {0, 0},
-            {0, 0}
-    };
-
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero Mat Zero Mat Test failed";
-}
-
-
-TEST(RectangularMatrices, ZeroMatNormalMatTest) {
-    int aRows = 2;
-    int aCols = 3;
-    int bCols = 2;
-
-    std::vector<std::vector<int>> A = {
-            {0, 0, 0},
-            {0, 0, 0}
-    };
-    std::vector<std::vector<int>> B = {
+    std::vector<std::vector<int>> BU = {
             {1, 2},
             {3, 4},
             {5, 6}
     };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
 
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 1));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 1));
 
-    std::vector<std::vector<int>> expected = {
-            {0, 0},
-            {0, 0}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+    multiplyMatrices(AZ, BU, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BU, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Zero Mat Normal Mat Test failed";
+    EXPECT_EQ(C, expected) << "Rect Zero Test failed on (0) * (1)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AU, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AU, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Rect Zero Test failed on (1) * (0)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Rect Zero Test failed on (0) * (0)";
 }
 
-
-TEST(RectangularMatrices, NormalMatZeroMatTest) {
+/*
+ * The following test checks the behaviour of the function when factors contain signed values
+ */
+TEST(RectangularVector, SignTest) {
     int aRows = 2;
     int aCols = 3;
-    int bCols = 2;
+    int bCols = 1;
 
     std::vector<std::vector<int>> A = {
-            {1, 2, 3},
-            {4, 5, 6}
+            {-33, -33, -33},
+            {15, 10,  0}
     };
     std::vector<std::vector<int>> B = {
-            {0, 0},
-            {0, 0},
-            {0, 0}
+            {-1},
+            {-1},
+            {-1}
     };
     std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
 
     multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
     std::vector<std::vector<int>> expected = {
-            {0, 0},
-            {0, 0}
+            {6},
+            {15}
     };
     multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Normal Mat Zero Mat Test failed";
+    ASSERT_EQ(C, expected) << "Rect Sign Test failed";
 }
 
-
-
-TEST(RectangularMatrices, MatIdentityMatTest) {
+/*
+ * The following test checks the behaviour of the function when at least one of the factors is an identity
+ */
+TEST(RectangularMatricesTests, IdentityTest) {
     int aRows = 2;
     int aCols = 2;
     int bCols = 2;
 
-    std::vector<std::vector<int>> A = {
+    std::vector<std::vector<int>> AI = {
             {1, 0},
             {0, 1}
     };
-    std::vector<std::vector<int>> B = {
+    std::vector<std::vector<int>> BN = {
             {17, 6},
-            {7, 1},
-            {8, 2}
+            {7,  1},
+            {8,  2}
     };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected = {
-            {0, 0},
-            {0, 0}
+    std::vector<std::vector<int>> AN = {
+            {6, 6},
+            {5, 5}
     };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero Mat Identity Mat Test failed";
-}
-
-
-TEST(RectangularMatrices, IdentityMatZeroMatTest) {
-    int aRows = 2;
-    int aCols = 2;
-    int bCols = 2;
-
-    std::vector<std::vector<int>> A = {
+    std::vector<std::vector<int>> BI = {
             {1, 0},
-            {0, 1}
-    };
-    std::vector<std::vector<int>> B = {
-            {0, 0},
-            {0, 0},
+            {0, 1},
             {0, 0}
     };
+
     std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
 
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
+    multiplyMatrices(AI, BN, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AI, BN, expected, aRows, aCols, bCols);
 
-    std::vector<std::vector<int>> expected = {
-            {0, 0},
-            {0, 0}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+    EXPECT_EQ(C, expected) << "Rect Matrix Identity Test failed";
 
-    ASSERT_EQ(C, expected) << "Identity Mat Zero Mat Test failed";
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AN, BI, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AN, BI, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Rect Vector Identity test failed";
 }
 
-
-
-
-
-TEST(RectangularMatrices, ZeroMatZeroMatTest2) {
-    int aRows = 2;
-    int aCols = 3;
-    int bCols = 2;
-
-    std::vector<std::vector<int>> A = {
-            {0, 0, 0},
-            {0, 0, 0}
-    };
-    std::vector<std::vector<int>> B = {
-            {0, 0},
-            {0, 0},
-            {0, 0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-
-    std::vector<std::vector<int>> expected = {
-            {0, 0},
-            {0, 0}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero Mat Zero Mat Test 2 failed";
-}
-
-TEST(RectangularVector, NormalTest) {
+/*
+ * The following test checks the behaviour of the function when the second factor is a vector
+ */
+TEST(RectangularMatricesTest, NonRectVectorTest) {
     int aRows = 2;
     int aCols = 3;
     int bCols = 1;
@@ -629,315 +471,26 @@ TEST(RectangularVector, NormalTest) {
     };
     multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
 
-    ASSERT_EQ(C, expected) << "Normal Test failed";
+    ASSERT_EQ(C, expected) << "Rect Vect-Second-Factor test failed";
 }
 
-
-TEST(RectangularVector, NormalTest2) {
-    int aRows = 2;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {-33,-33, -33},
-            {-16, -1, 0}
-    };
-    std::vector<std::vector<int>> B = {
-            {-1},
-            {-1},
-            {-1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {6},
-            {15}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-// TEST on Vector times 1 Vector ********************************************************
-
-TEST(VectorVector, VectorTimesOneVector) {
-    int aRows = 1;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {33, 33, 33}
-    };
-    std::vector<std::vector<int>> B = {
-            {1},
-            {1},
-            {1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {18}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-// TEST on Vector times -1 Vector ********************************************************
-
-TEST(VectorVector, VectorTimesMinusOneVector) {
-    int aRows = 1;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {33, 33, 33}
-    };
-    std::vector<std::vector<int>> B = {
-            {-1},
-            {-1},
-            {-1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {-18}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-// TEST on Vector times 0 Vector ********************************************************
-
-TEST(VectorVector, VectorTimesZeroVector) {
-    int aRows = 1;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {33, 33, 33}
-    };
-    std::vector<std::vector<int>> B = {
-            {0},
-            {0},
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {0}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-// 0 Vector times 0 Vector
-
-TEST(VectorVector, ZeroVectorTimesZeroVector) {
-    int aRows = 1;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {0, 0, 0}
-    };
-    std::vector<std::vector<int>> B = {
-            {0},
-            {0},
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {0}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-
-TEST(VectorVector, ZeroVectorTimesNormalVector) {
-    int aRows = 1;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {0, 0, 0}
-    };
-    std::vector<std::vector<int>> B = {
-            {1},
-            {11},
-            {14}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {0}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-
-TEST(VectorVector, NormalVectorTimesNormalVector) {
-    int aRows = 1;
-    int aCols = 3;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1, 2, 3}
-    };
-    std::vector<std::vector<int>> B = {
-            {1},
-            {11},
-            {14}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected = {
-            {53}
-    };
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Normal Test failed";
-}
-
-//TEST on Vector times 1 scalar ********************************************************
-
-TEST(ScalarVector, ScalarTimesZeroVector) {
-    int aRows = 7;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {0},
-            {0},
-            {0},
-            {0},
-            {0},
-            {0},
-            {0}
-    };
-    std::vector<std::vector<int>> B = {
-            {6}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Scalar times 0 vector failed";
-}
-
-TEST(ScalarVector, ScalarTimesNormalVector) {
-    int aRows = 7;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1},
-            {2},
-            {3},
-            {4},
-            {5},
-            {6},
-            {7}
-    };
-    std::vector<std::vector<int>> B = {
-            {3}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Scalar times normal vector failed";
-}
-
-
-TEST(ScalarVector, ZeroScalarTimesNormalVector) {
-    int aRows = 7;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1},
-            {2},
-            {3},
-            {4},
-            {5},
-            {6},
-            {7}
-    };
-    std::vector<std::vector<int>> B = {
-            {0}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "Zero scalar times normal vector failed";
-}
-
-
-
-TEST(ScalarVector, OneScalarTimesNormalVector) {
-    int aRows = 7;
-    int aCols = 1;
-    int bCols = 1;
-
-    std::vector<std::vector<int>> A = {
-            {1},
-            {2},
-            {3},
-            {4},
-            {5},
-            {6},
-            {7}
-    };
-    std::vector<std::vector<int>> B = {
-            {1}
-    };
-    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
-
-    multiplyMatrices(A, B, C, aRows, aCols, bCols);
-    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
-    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
-
-    ASSERT_EQ(C, expected) << "One scalar times normal vector failed";
-}
-
-// Fuzzy test ********************************************************
-
-TEST(FuzzyTest, FuzzyTest) {
-    auto test_number = 9000;
+/*
+ * The following test does fuzzy test on the behaviour of the function with random values
+ */
+TEST(RectangularMatricesTests, FuzzyTest) {
     int aRows = 2;
     int aCols = 3;
     int bCols = 2;
-    auto result_list = std::vector<std::vector<std::vector<int>>>(test_number, std::vector<std::vector<int>>(9, std::vector<int>(9, 0)));
-    auto expected_list = std::vector<std::vector<std::vector<int>>>(test_number, std::vector<std::vector<int>>(9, std::vector<int>(9, 0)));
-        #include <random>
+
+    std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols,0));
+    std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols,0));
+
     std::random_device rd;
-    for (int i = 0; i < test_number/9; i++) {
+    for (int i = 0; i < FUZZY_IT; i++) {
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(-100, 100);
-        std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
-        std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols, 0));
+        std::uniform_int_distribution<> dis(1, 9);
+        std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+        std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
         for (int j = 0; j < aRows; j++) {
             for (int k = 0; k < aCols; k++) {
                 A[j][k] = dis(gen);
@@ -948,20 +501,154 @@ TEST(FuzzyTest, FuzzyTest) {
                 B[j][k] = dis(gen);
             }
         }
-        multiplyMatrices(A, B, result_list[i], aRows, aCols, bCols);
-        multiplyMatricesWithoutErrors(A, B, expected_list[i], aRows, aCols, bCols);
+        multiplyMatrices(A, B, C, aRows, aCols, bCols);
+        multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+        EXPECT_EQ(C, expected) << "Rect Fuzzy Test iteration failed";
     }
+}
 
 
-    aRows = 1;
-    aCols = 1;
-    bCols = 1;
+// TEST ON VECTORS MATRICES ********************************************************
+// The following suite of tests wants to check various behaviour when the function is
+// required to perform matrix multiplication with vector form factors
 
-    for( int i = test_number/9 ; i < test_number/9*2 ; i++){
+/*
+ * The following test checks the behaviour of the function when one of the factor is a unitary vector
+ */
+TEST(VectorMatricesTests, UnitatyTest) {
+    int aRows = 1;
+    int aCols = 3;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> AN = {
+            {33, 33, 33}
+    };
+    std::vector<std::vector<int>> BI = {
+            {1},
+            {1},
+            {1}
+    };
+    std::vector<std::vector<int>> AI = {
+            {1, 1, 1}
+    };
+    std::vector<std::vector<int>> BN = {
+            {22},
+            {17},
+            {15}
+    };
+
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AI, BN, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AI, BN, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Vect First Unitary Test failed";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AN, BI, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AN, BI, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Vect Second Unitary test failed";
+}
+
+/*
+ * The following test checks the behaviour of the function when factors contains signed values
+ */
+TEST(VectorMatricesTests, SignTest) {
+    int aRows = 1;
+    int aCols = 3;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> A = {
+            {33, 33, 33}
+    };
+    std::vector<std::vector<int>> B = {
+            {-1},
+            {-1},
+            {-1}
+    };
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(A, B, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+
+    ASSERT_EQ(C, expected) << "Vect Sign test failed";
+}
+
+/*
+ * The following test checks the behaviour of the function at least one of factor is zero matrix
+ */
+TEST(VectorMatricesTests, ZeroTest) {
+    int aRows = 1;
+    int aCols = 3;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> AZ = {
+            {0, 0, 0}
+    };
+    std::vector<std::vector<int>> AU = {
+            {1, 1, 1}
+    };
+    std::vector<std::vector<int>> BZ = {
+            {0},
+            {0},
+            {0}
+    };
+    std::vector<std::vector<int>> BU = {
+            {1},
+            {1},
+            {1}
+    };
+
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 1));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BU, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BU, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Vect Zero Test failed on (0) * (1)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AU, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AU, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Vect Zero Test failed on (1) * (0)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "Vect Zero Test failed on (0) * (0)";
+}
+
+/*
+ * The following test does fuzzy test on the behaviour of the function with random values
+ */
+TEST(VectorMatricesTests, FuzzyTest) {
+    int aRows = 1;
+    int aCols = 3;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
+    std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols, 0));
+
+    std::random_device rd;
+    for (int i = 0; i < FUZZY_IT; i++) {
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(-200, 200);
-        std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
-        std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols, 0));
+        std::uniform_int_distribution<> dis(1, 9);
+        std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+        std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
         for (int j = 0; j < aRows; j++) {
             for (int k = 0; k < aCols; k++) {
                 A[j][k] = dis(gen);
@@ -972,20 +659,175 @@ TEST(FuzzyTest, FuzzyTest) {
                 B[j][k] = dis(gen);
             }
         }
-        multiplyMatrices(A, B, result_list[i], aRows, aCols, bCols);
-        multiplyMatricesWithoutErrors(A, B, expected_list[i], aRows, aCols, bCols);
+        multiplyMatrices(A, B, C, aRows, aCols, bCols);
+        multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+        EXPECT_EQ(C, expected) << "Vect Fuzzy Test iteration failed";
     }
+}
+
+// TEST ON VECTOR-SCALAR MATRICES ********************************************************
+// The following suite of tests wants to check various behaviour when the function is
+// required to perform matrix multiplication on (vector x scalar) form
+
+/*
+ * The following test checks the behaviour of the function at least one of factor is zero matrix
+ */
+TEST(VectorScalarTests, ZeroTest) {
+    int aRows = 7;
+    int aCols = 1;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> AZ = {
+            {0},
+            {0},
+            {0},
+            {0},
+            {0},
+            {0},
+            {0}
+    };
+    std::vector<std::vector<int>> AU = {
+            {1},
+            {1},
+            {1},
+            {1},
+            {1},
+            {1},
+            {1}
+    };
+    std::vector<std::vector<int>> BU = {
+            {1}
+    };
+    std::vector<std::vector<int>> BZ = {
+            {0}
+    };
+
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 1));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BU, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BU, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "VectScalar Zero Test failed on (0) * (1)";
 
 
-    aRows = 8;
-    aCols = 8;
-    bCols = 8;
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
 
-    for( int i = test_number/9*2 ; i < test_number/9*5 ; i++){
+    multiplyMatrices(AU, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AU, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "VectScalar Zero Test failed on (1) * (0)";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 1));
+
+    multiplyMatrices(AZ, BZ, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AZ, BZ, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "VectScalar Zero Test failed on (0) * (0)";
+}
+
+/*
+ * The following test checks the behaviour of the function when one of the factor is a unitary vector
+ */
+TEST(VectorScalarTests, UnitaryTest) {
+    int aRows = 7;
+    int aCols = 1;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> AI = {
+            {1},
+            {1},
+            {1},
+            {1},
+            {1},
+            {1},
+            {1}
+    };
+    std::vector<std::vector<int>> AN = {
+            {3},
+            {3},
+            {3},
+            {3},
+            {3},
+            {3},
+            {3}
+    };
+    std::vector<std::vector<int>> BI = {
+            {1}
+    };
+    std::vector<std::vector<int>> BN = {
+            {3}
+    };
+    
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AI, BN, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AI, BN, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "VectScalar First Unitary Test failed";
+
+
+    C = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+    expected = std::vector<std::vector<int>>(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(AN, BI, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(AN, BI, expected, aRows, aCols, bCols);
+
+    EXPECT_EQ(C, expected) << "VectScalar Second Unitary test failed";
+}
+
+/*
+ * The following test checks the behaviour of the function when factors contains signed values
+ */
+TEST(VectorScalarTests, SignTest) {
+    int aRows = 7;
+    int aCols = 1;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> A = {
+            {-1},
+            {1},
+            {1},
+            {-1},
+            {1},
+            {-1},
+            {1}
+    };
+    std::vector<std::vector<int>> B = {
+            {65}
+    };
+
+    std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+
+    multiplyMatrices(A, B, C, aRows, aCols, bCols);
+    multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+
+    ASSERT_EQ(C, expected) << "VectScalar Sign test failed";
+}
+
+/*
+ * The following test does fuzzy test on the behaviour of the function with random values
+ */
+TEST(VectorScalarTests, FuzzyTest) {
+    int aRows = 7;
+    int aCols = 1;
+    int bCols = 1;
+
+    std::vector<std::vector<int>> A(aRows, std::vector<int>(aRows,0));
+    std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols, 0));
+
+    std::random_device rd;
+    for (int i = 0; i < FUZZY_IT; i++) {
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<> dis(-200, 200);
-        std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
-        std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols, 0));
+        std::uniform_int_distribution<> dis(1, 9);
+        std::vector<std::vector<int>> C(aRows, std::vector<int>(aCols, 0));
+        std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+
         for (int j = 0; j < aRows; j++) {
             for (int k = 0; k < aCols; k++) {
                 A[j][k] = dis(gen);
@@ -996,12 +838,21 @@ TEST(FuzzyTest, FuzzyTest) {
                 B[j][k] = dis(gen);
             }
         }
-        multiplyMatrices(A, B, result_list[i], aRows, aCols, bCols);
-        multiplyMatricesWithoutErrors(A, B, expected_list[i], aRows, aCols, bCols);
+        multiplyMatrices(A, B, C, aRows, aCols, bCols);
+        multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+        EXPECT_EQ(C, expected) << "VectScalar Fuzzy Test iteration failed";
     }
-    //let's now fuzzy test random dimensions'
+}
 
-    for (int i = test_number/9*5; i < test_number; i++) {
+// TEST ON RANDOM MATRICES DIMENSIONS ********************************************************
+// The following tests wants to check various behaviour when the function is
+// required to perform matrix multiplication with matrix with random dimensions
+
+TEST(RandomDimensionsTests, FuzzyTest) {
+    int aRows, aCols, bCols;
+    std::random_device rd;
+
+    for (int i = 0; i < FUZZY_IT; i++) {
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> dis(1, 9);
         aRows = dis(gen);
@@ -1009,6 +860,9 @@ TEST(FuzzyTest, FuzzyTest) {
         bCols = dis(gen);
         std::vector<std::vector<int>> A(aRows, std::vector<int>(aCols, 0));
         std::vector<std::vector<int>> B(aCols, std::vector<int>(bCols, 0));
+        std::vector<std::vector<int>> C(aRows, std::vector<int>(bCols, 0));
+        std::vector<std::vector<int>> expected(aRows, std::vector<int>(bCols, 0));
+
         for (int j = 0; j < aRows; j++) {
             for (int k = 0; k < aCols; k++) {
                 A[j][k] = dis(gen);
@@ -1019,32 +873,136 @@ TEST(FuzzyTest, FuzzyTest) {
                 B[j][k] = dis(gen);
             }
         }
-        multiplyMatrices(A, B, result_list[i], aRows, aCols, bCols);
-        multiplyMatricesWithoutErrors(A, B, expected_list[i], aRows, aCols, bCols);
+        multiplyMatrices(A, B, C, aRows, aCols, bCols);
+        multiplyMatricesWithoutErrors(A, B, expected, aRows, aCols, bCols);
+        EXPECT_EQ(C, expected) << "Random dimension matrices fuzzy test iteration failed";
     }
-
-
-
-
-    ASSERT_EQ(result_list, expected_list) << "Fuzzy test failed";
-
-
-
 }
 
+// TEST ON MATRICES PROPERTIES ********************************************************
+// The following tests wants to check if the result of the function respect the
+// properties of matrix multiplication
+//
+// Note that Neutral element and Zero element has been already tested multiple times
+// in previous tests
+
+/*
+ * This test checks the commutative property (that matrix multiplication does not have)
+ */
+TEST(MatricesProperties, NotCommutative){
+    int aRows = 2;
+    int aCols = 2;
+    int bCols = 2;
+
+    std::vector<std::vector<int>> A = {
+            {10,15},
+            {60,80},
+    };
+    std::vector<std::vector<int>> B = {
+            {1,15},
+            {9,8}
+    };
+
+    std::vector<std::vector<int>> C1(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> C2(aRows, std::vector<int>(bCols, 0));
+
+
+    multiplyMatrices(A, B, C1, aRows, aCols, bCols);
+    multiplyMatrices(A, B, C2, aRows, aCols, bCols);
+
+    ASSERT_NE(C1,C2) << "Commutative test failed";
+}
+
+/*
+ * This test checks the associative property (that matrix multiplication have)
+ */
+TEST(MatricesProperties, Associative){
+    int aRows = 2;
+    int aCols = 2;
+    int bCols = 2;
+
+    std::vector<std::vector<int>> A = {
+            {10,15},
+            {60,80},
+    };
+    std::vector<std::vector<int>> B = {
+            {1,15},
+            {9,8}
+    };
+    std::vector<std::vector<int>> C = {
+            {8,40},
+            {0,20000}
+    };
+
+    std::vector<std::vector<int>> T1(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> T2(aRows, std::vector<int>(bCols, 0));
+
+    std::vector<std::vector<int>> D1(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> D2(aRows, std::vector<int>(bCols, 0));
+
+
+    multiplyMatrices(A, B, T1, aRows, aCols, bCols);
+    multiplyMatrices(T1, C, D1, aRows, aCols, bCols);
+
+    multiplyMatrices(B, C, T2, aRows, aCols, bCols);
+    multiplyMatrices(A, T2, D2, aRows, aCols, bCols);
+
+    ASSERT_EQ(D1,D2) << "Associative test failed";
+}
+
+/*
+ * This test checks distributive property (that matrix multiplication have)
+ */
+TEST(MatricesProperties, Distributive){
+    int aRows = 2;
+    int aCols = 2;
+    int bCols = aRows;
+
+    std::vector<std::vector<int>> A = {
+            {10,15},
+            {60,80},
+    };
+    std::vector<std::vector<int>> B = {
+            {1,15},
+            {9,8}
+    };
+    std::vector<std::vector<int>> C = {
+            {8,40},
+            {0,20000}
+    };
 
 
 
+    std::vector<std::vector<int>> AC(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> BC(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> AC_BC(aRows, std::vector<int>(bCols, 0));
 
+    multiplyMatrices(A,C, AC, aRows, aCols, bCols);
+    multiplyMatrices(B,C, BC, aRows, aCols, bCols);
 
+    for(int i=0; i<aRows; ++i){
+        for(int j=0; j<aCols; ++j){
+            AC_BC[i][j] = AC[i][j] + BC[i][j];
+        }
+    }
+
+    std::vector<std::vector<int>> A_B(aRows, std::vector<int>(bCols, 0));
+    std::vector<std::vector<int>> A_B_C(aRows, std::vector<int>(bCols, 0));
+
+    for(int i=0; i<aRows; ++i){
+        for(int j=0; j<aCols; ++j){
+            A_B[i][j] = A[i][j] + B[i][j];
+        }
+    }
+
+    multiplyMatrices(A_B, C, A_B_C, aRows, aCols, bCols);
+
+    ASSERT_EQ(AC_BC,A_B_C) << "Distributive test failed";
+}
 
 // *********************************************************************************
 
-
-
 int main(int argc, char **argv) {
-
-
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
